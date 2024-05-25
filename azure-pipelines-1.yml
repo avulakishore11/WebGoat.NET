@@ -19,15 +19,14 @@ steps:
      command: 'restore'
      majorVersion: '$(version)'
      projects: 'WebGoat.NET.sln'
-     feedsToUse: 'config'
+
  - task: UseDotNet@2
    inputs:
     packageType: 'sdk'
-    version: '3.5'     
- 
- - task: DotNetCoreCLI@2
-   displayName: 'Build success'
+    version: '$(version)'
+
+ - task: 'DotNetCoreCLI@2'
    inputs:
-     command: 'build'
-     majorVersion: '$(version)'
-     projects: '**/*.sln'
+      command: 'build'
+      projects: 'WebGoat.NET.sln'
+      arguments: '--configuration$(buildconfiguration)'
