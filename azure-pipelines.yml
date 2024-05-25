@@ -1,0 +1,41 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main  # Adjust this to the branch you want to trigger builds on
+
+pool:
+  vmImage: 'windows-2019'  # Use a Windows VM image that includes the required .NET Framework
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '4.7.2'  # This is a placeholder; the key here is to use an image with .NET Framework 3.5 installed
+    installationPath: $(Agent.ToolsDirectory)/dotnet
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: 'WebGoat.NET.sln'
+
+- task: VSBuild@1
+  inputs:
+    solution: 'WebGoat.NET.sln'
+    msbuildArgs: '/p:Configuration=Release'
+    platform: 'Any CPU'
+    configuration: 'Release'
+
+- task: VSTest@2
+  inputs:
+    platform: 'Any CPU'
+    configuration: 'Release'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+
