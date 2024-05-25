@@ -1,19 +1,14 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
 - main  # Adjust this to the branch you want to trigger builds on
 
 pool:
-  vmImage: 'windows-2019'  # Use a Windows VM image that includes the required .NET Framework
+  vmImage: 'ubuntu-latest'  # Use a Windows VM image that includes .NET Framework 3.5
 
 steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '4.7.2'  # This is a placeholder; the key here is to use an image with .NET Framework 3.5 installed
+    version: '3.5'  # Ensuring .NET Framework 3.5 is used
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - task: NuGetToolInstaller@1
@@ -38,4 +33,3 @@ steps:
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
-
