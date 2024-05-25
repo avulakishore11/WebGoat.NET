@@ -19,4 +19,9 @@ steps:
      command: 'restore'
      version: '$(version)'
      projects: 'WebGoat.NET.sln'
-     feedsToUse: 'select'
+     feedsToUse: 'config'
+ 
+ - task: DotNetCoreCLI@2
+   inputs:
+     command: 'build'
+     projects: '**/*.sln'
