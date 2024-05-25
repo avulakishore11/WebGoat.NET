@@ -10,7 +10,7 @@ pool:
   vmImage: windows-2019
 
 variables:
- version: 3.5
+ version: 3.5.x
 
 steps:
  - task: DotNetCoreCLI@2
