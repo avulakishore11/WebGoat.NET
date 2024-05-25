@@ -17,11 +17,13 @@ steps:
    displayName: 'resore-success'
    inputs:
      command: 'restore'
-     version: '$(version)'
+     majorVersion: '$(version)'
      projects: 'WebGoat.NET.sln'
      feedsToUse: 'config'
  
  - task: DotNetCoreCLI@2
+   displayName: 'Build success'
    inputs:
      command: 'build'
+     majorVersion: '$(version)'
      projects: '**/*.sln'
