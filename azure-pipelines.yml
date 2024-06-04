@@ -1,8 +1,3 @@
-# ASP.NET
-# Build and test ASP.NET projects.
-# Add steps that publish symbols, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
-
 trigger:
 - master
 
@@ -14,53 +9,39 @@ variables:
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
 
-steps:
-- task: NuGetToolInstaller@1
+stages:
+- stage: Build
+  jobs:
+  - job: Restore
+    displayName: 'Restore NuGet Packages'
+    steps:
+    - task: NuGetToolInstaller@1
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: '$(solution)'
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(solution)'
+# Build
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+  - job: Build
+    displayName: 'Build Solution'
+    steps:
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
 
-# Install Node.js
-- task: UseNode@1
-  inputs:
-    version: '14.x'
-  displayName: 'Install Node.js'
+  - job: Test
+    displayName: 'Test Solution'
+    steps:
+      - task: VSTest@2
+        displayName: 'Run Tests'
+        inputs:
+          platform: '$(buildPlatform)'
+          configuration: '$(buildConfiguration)'
 
-# Install VSCE
-- script: |
-    npm install -g vsce
-  displayName: 'Install VSCE'
-
-# Install dependencies for VS Code extension
-- script: |
-    npm ci
-  displayName: 'Install dependencies'
-  workingDirectory: 'vscode-extension'
-
-# Package the VS Code extension
-- script: |
-    vsce package
-  displayName: 'Package VS Code extension'
-
-# Publish the VS Code extension
-- script: |
-    vsce publish -p $(VSCODE_MARKETPLACE_TOKEN)
-  displayName: 'Publish VS Code extension'
-  env:
-    VSCODE_MARKETPLACE_TOKEN: $(VSCODE_MARKETPLACE_TOKEN)
-
+ 
 
 
