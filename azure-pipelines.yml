@@ -33,4 +33,33 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
+# Install Node.js
+- task: UseNode@1
+  inputs:
+    version: '14.x'
+  displayName: 'Install Node.js'
+
+# Install VSCE
+- script: |
+    npm install -g vsce
+  displayName: 'Install VSCE'
+
+# Install dependencies for VS Code extension
+- script: |
+    npm ci
+  displayName: 'Install dependencies'
+
+# Package the VS Code extension
+- script: |
+    vsce package
+  displayName: 'Package VS Code extension'
+
+# Publish the VS Code extension
+- script: |
+    vsce publish -p $(VSCODE_MARKETPLACE_TOKEN)
+  displayName: 'Publish VS Code extension'
+  env:
+    VSCODE_MARKETPLACE_TOKEN: $(VSCODE_MARKETPLACE_TOKEN)
+
+
 
