@@ -1,40 +1,47 @@
-# .azure-pipelines.yml
 trigger:
-- main
+- master
 
 pool:
   vmImage: 'windows-latest'
 
 variables:
-  buildConfiguration: 'Release'
   solution: '**/*.sln'
-  project: '**/WebGoat.NET.csproj'
   buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
 
-steps:
-- task: UseDotNet@2
-  inputs:
-    packageType: 'sdk'
-    version: '6.x'
-    installationPath: $(Agent.ToolsDirectory)/dotnet
+stages:
+- stage: Build
+  jobs:
+  - job: Restore
+    displayName: 'Restore NuGet Packages'
+    steps:
+    - task: NuGetToolInstaller@1
+    - task: NuGetCommand@2
 
-- task: NuGetToolInstaller@1
-  inputs:
-    versionSpec: 'latest'
+      inputs:
+        restoreSolution: '$(solution)'
+        # Build
 
-- task: NuGetCommand@2
-  inputs:
-    restoreSolution: true
-    solution: '$(solution)'
+  - job: Build
+    displayName: 'Build Solution'
+    steps:
+    - task: VSBuild@1
+      inputs:
+        solution: '$(solution)'
+        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
-- task: VSBuild@1
-  inputs:
-    solution: '$(solution)'
-    msbuildArgs: '/p:Configuration=$(buildConfiguration)'
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+  - job: Test
 
-- task: VSTest@2
-  inputs:
-    platform: '$(buildPlatform)'
-    configuration: '$(buildConfiguration)'
+    displayName: 'Test Solution'
+    steps:
+    - task: VSTest@2
+      displayName: 'Run Tests'
+      inputs:
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
+
+
+
+
