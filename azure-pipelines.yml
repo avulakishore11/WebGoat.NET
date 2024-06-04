@@ -48,6 +48,7 @@ steps:
 - script: |
     npm ci
   displayName: 'Install dependencies'
+  workingDirectory: 'vscode-extension'
 
 # Package the VS Code extension
 - script: |
