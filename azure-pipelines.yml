@@ -8,6 +8,10 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
+  sqlServerName: 'webgoatsqlserver1.database.windows.net'
+  sqlDatabaseName: 'webgoatdb'
+  sqlAdminUser: 'kishore'
+  sqlAdminPassword: '16Nf1a0101@.'
 
 stages:
 - stage: Build
