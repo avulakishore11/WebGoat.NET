@@ -8,9 +8,9 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  sqlServerName: 'webgoatsqlserver.database.windows.net'
+  sqlServerName: 'webgoaterver-1.database.windows.net'
   sqlDatabaseName: 'webgoatdb'
-  sqlAdminUser: 'sqlserver'
+  sqlAdminUser: 'WEBGOATSQL-adminuser'
   sqlAdminPassword: '16Nf1a0101@.'
 
 stages:
@@ -57,8 +57,14 @@ stages:
     displayName: 'Setup SQL Database'
     steps:
     - script: |
+        echo "Testing SQL Server connection..."
+        sqlcmd -S tcp:$(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "SELECT @@VERSION"
+      displayName: 'Test SQL Server Connection'
+    - script: |
+        echo "Creating SampleTable in SQL Database..."
         sqlcmd -S tcp:$(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SampleTable' AND xtype='U') CREATE TABLE SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
-     
+      displayName: 'Create SampleTable in SQL Database'
+
 - stage: Deploy
   dependsOn: Build
   jobs:
@@ -74,12 +80,13 @@ stages:
           - task: AzureWebApp@1
             inputs:
               azureSubscription: 'webgoat-svcconnection'
-              appType: 'webApp'
+              appType: webApp
               appName: 'webgoat-webapp'
               package: '$(Pipeline.Workspace)/webgoat/webgoat.zip'
           - task: AzureAppServiceSettings@1
             inputs:
               azureSubscription: 'webgoat-svcconnection'
+              resourceGroupName: 'webgoat-rg'
               appName: 'webgoat-webapp'
               appSettings: |
                 [
