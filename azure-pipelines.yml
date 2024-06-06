@@ -75,5 +75,5 @@ stages:
 # it will available in your aure app service +web app
         appType: 'webApp'
         appName: 'webgoat-webapp' # that web app name 
-        package: '$(build.artifactStagingDirectory)/**/*.zip' 
+        package: '$(Pipeline.Workspace)/webgoat/**/*.zip' 
         deploymentMethod: 'runFromPackage'       
