@@ -11,7 +11,7 @@ variables:
   sqlServerName: 'webgoatsqlserver1.database.windows.net'
   sqlDatabaseName: 'webgoatdb'
   sqlAdminUser: 'kishore'
-  sqlAdminPassword: '16Nf1a0101@.'
+  sqlAdminPassword: '$(sqlserver-credentials)'
 
 stages:
 - stage: Build
@@ -20,14 +20,13 @@ stages:
     displayName: 'Restore NuGet Packages'
     steps:
     - task: NuGetToolInstaller@1
-
     - task: NuGetCommand@2
       inputs:
         restoreSolution: '$(solution)'
-# Build
 
   - job: Build
     displayName: 'Build Solution'
+    dependsOn: Restore
     steps:
     - task: VSBuild@1
       inputs:
@@ -36,16 +35,24 @@ stages:
         platform: '$(buildPlatform)'
         configuration: '$(buildConfiguration)'
 
-
   - job: Test
     displayName: 'Test Solution'
+    dependsOn: Build
     steps:
-      - task: VSTest@2
-        displayName: 'Run Tests'
-        inputs:
-          platform: '$(buildPlatform)'
-          configuration: '$(buildConfiguration)'
+    - task: VSTest@2
+      displayName: 'Run Tests'
+      inputs:
+        platform: '$(buildPlatform)'
+        configuration: '$(buildConfiguration)'
 
- 
-
-
+- stage: DatabaseSetup
+  dependsOn: Build
+  jobs:
+  - job: Setup
+    displayName: 'Setup SQL Database'
+    steps:
+    - task: CmdLine@2
+      inputs:
+        script: |
+          sqlcmd -S $(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "CREATE TABLE IF NOT EXISTS SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
+      displayName: 'Setup SQL Database'
