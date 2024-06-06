@@ -8,10 +8,11 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  sqlServerName: 'webgoatsqlserver1.database.windows.net'
+  sqlServerName: 'webgaotsqlserver.database.windows.net'
   sqlDatabaseName: 'webgoatdb'
-  sqlAdminUser: 'kishore'
-  sqlAdminPassword: '16Nf1a0101@.'
+
+variableGroups:
+- SQLCredentials
 
 stages:
 - stage: Build
@@ -51,8 +52,30 @@ stages:
   - job: Setup
     displayName: 'Setup SQL Database'
     steps:
-    - task: CmdLine@2
+    - script: |
+        sqlcmd -S $(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "CREATE TABLE IF NOT EXISTS SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
+      env:
+        SQL_USER: $(sqlAdminUser)
+        SQL_PASSWORD: $(sqlAdminPassword)
+
+- stage: Deploy
+  dependsOn: Build # this deploywebapp will wait until build succeded 
+  jobs:
+  - deployment: DeployWebApp
+    displayName: 'Deploy to Azure Web App'
+    environment: 'production'
+
+- stage: Deploy
+  dependsOn: DatabaseSetup
+  jobs:
+  - job: DeployApp
+    displayName: 'Deploy Application'
+    steps:
+    - task: AzureWebApp@1
       inputs:
-        script: |
-          sqlcmd -S $(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "CREATE TABLE IF NOT EXISTS SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
-      displayName: 'Setup SQL Database'
+        azureSubscription: 'your-azure-subscription' # use your name of service connection from your azure devops#
+# it will available in your aure app service +web app
+        appType: 'webApp'
+        appName: 'webgoat-webapp' # that web app name 
+        package: '$(build.artifactStagingDirectory)/**/*.zip' 
+        deploymentMethod: 'runFromPackage'       
