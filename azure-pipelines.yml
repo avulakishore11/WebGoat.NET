@@ -8,12 +8,10 @@ variables:
   solution: '**/*.sln'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  sqlServerName: 'webgaotsqlserver.database.windows.net'
+  sqlServerName: 'webgoatsqlserver.database.windows.net'
   sqlDatabaseName: 'webgoatdb'
   sqlAdminUser: 'sqlserver'
   sqlAdminPassword: '16Nf1a0101@.'
-
-
 
 stages:
 - stage: Build
@@ -59,7 +57,46 @@ stages:
     displayName: 'Setup SQL Database'
     steps:
     - script: |
-        sqlcmd -S $(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "CREATE TABLE IF NOT EXISTS SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
-      
-
-
+        sqlcmd -S tcp:$(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SampleTable' AND xtype='U') CREATE TABLE SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
+     
+- stage: Deploy
+  dependsOn: Build
+  jobs:
+  - deployment: DeployWebGoat
+    displayName: 'Deploy WebGoat Application'
+    environment: 'production'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - download: current
+            artifact: webgoat
+          - task: AzureWebApp@1
+            inputs:
+              azureSubscription: 'webgoat-svcconnection'
+              appType: 'webApp'
+              appName: 'webgoat-webapp'
+              package: '$(Pipeline.Workspace)/webgoat/webgoat.zip'
+          - task: AzureAppServiceSettings@1
+            inputs:
+              azureSubscription: 'webgoat-svcconnection'
+              appName: 'webgoat-webapp'
+              appSettings: |
+                [
+                  {
+                    "name": "SQLSERVER",
+                    "value": "$(sqlServerName)"
+                  },
+                  {
+                    "name": "DATABASE",
+                    "value": "$(sqlDatabaseName)"
+                  },
+                  {
+                    "name": "USERNAME",
+                    "value": "$(sqlAdminUser)"
+                  },
+                  {
+                    "name": "PASSWORD",
+                    "value": "$(sqlAdminPassword)"
+                  }
+                ]
