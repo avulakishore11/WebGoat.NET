@@ -11,7 +11,7 @@ variables:
   sqlServerName: 'webgoatsqlserver1.database.windows.net'
   sqlDatabaseName: 'webgoatdb'
   sqlAdminUser: 'kishore'
-  sqlAdminPassword: '$(sqlserver-credentials)'
+  sqlAdminPassword: '16Nf1a0101@.'
 
 stages:
 - stage: Build
