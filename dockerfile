@@ -1,23 +1,25 @@
-# use the official .NET core SDK image to build the application
+# Stage 1: Build the .NET application
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
+
+# Set the working directory
 WORKDIR /app
 
-# copy the .csproj & .sln files and restore
-COPY . .
+# Copy the .csproj file and restore dependencies
+COPY *.csproj .
 RUN dotnet restore
 
-# Run test
-RUN dotnet test
+# Copy the remaining source code and build the application
+COPY . .
+RUN dotnet publish -c Release -o /app/out
 
-# run build and publish the artifact
+# Stage 2: Create the runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:6.0
 
-RUN dotnet publish -c Dev -o out
+# Set the working directory
+WORKDIR /app
 
-# Use the official .NET runtime image to run the application
-
-FROM mcr.microsoft.com/dotnet/sdk:6.0
+# Copy the published files from the build stage
 COPY --from=builder /app/out .
 
-# define the entrypoint for the container 
-
+# Define the entrypoint for the container
 ENTRYPOINT ["dotnet", "WebGoat.NET.dll"]
