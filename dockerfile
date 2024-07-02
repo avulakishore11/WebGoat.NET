@@ -13,6 +13,7 @@ COPY . .
 
 # Run test
 RUN dotnet test
+
 # Run build and publish
 RUN dotnet publish -c Release -o /app/out
 
