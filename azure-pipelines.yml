@@ -2,108 +2,21 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
-
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  sqlServerName: 'webgoaterver-1.database.windows.net'
-  sqlDatabaseName: 'webgoatdb'
-  sqlAdminUser: 'WEBGOATSQL-adminuser'
-  sqlAdminPassword: '16Nf1a0101@.'
+ name: 'webgaot-pool'
 
 stages:
-- stage: Build
-  jobs:
-  - job: Restore
-    displayName: 'Restore NuGet Packages'
-    steps:
-    - task: NuGetToolInstaller@1
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(solution)'
-
-  - job: Build
-    displayName: 'Build Solution'
-    dependsOn: Restore
-    steps:
-    - task: VSBuild@1
-      inputs:
-        solution: '$(solution)'
-        msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-    - task: PublishBuildArtifacts@1
-      inputs:
-        pathToPublish: '$(build.artifactStagingDirectory)'
-        artifactName: 'webgoat'
-        publishLocation: 'Container'
-
-  - job: Test
-    displayName: 'Test Solution'
-    dependsOn: Build
-    steps:
-    - task: VSTest@2
-      displayName: 'Run Tests'
-      inputs:
-        platform: '$(buildPlatform)'
-        configuration: '$(buildConfiguration)'
-
-- stage: DatabaseSetup
-  dependsOn: Build
-  jobs:
-  - job: Setup
-    displayName: 'Setup SQL Database'
-    steps:
-    - script: |
-        echo "Testing SQL Server connection..."
-        sqlcmd -S tcp:$(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "SELECT @@VERSION"
-      displayName: 'Test SQL Server Connection'
-    - script: |
-        echo "Creating SampleTable in SQL Database..."
-        sqlcmd -S tcp:$(sqlServerName) -U $(sqlAdminUser) -P $(sqlAdminPassword) -d $(sqlDatabaseName) -Q "IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='SampleTable' AND xtype='U') CREATE TABLE SampleTable (Id INT PRIMARY KEY, Name NVARCHAR(50));"
-      displayName: 'Create SampleTable in SQL Database'
-
-- stage: Deploy
-  dependsOn: Build
-  jobs:
-  - deployment: DeployWebGoat
-    displayName: 'Deploy WebGoat Application'
-    environment: 'production'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - download: current
-            artifact: webgoat
-          - task: AzureWebApp@1
-            inputs:
-              azureSubscription: 'webgoat-svcconnection'
-              appType: webApp
-              appName: 'webgoat-webapp'
-              package: '$(Pipeline.Workspace)/webgoat/webgoat.zip'
-          - task: AzureAppServiceSettings@1
-            inputs:
-              azureSubscription: 'webgoat-svcconnection'
-              resourceGroupName: 'webgoat-rg'
-              appName: 'webgoat-webapp'
-              appSettings: |
-                [
-                  {
-                    "name": "SQLSERVER",
-                    "value": "$(sqlServerName)"
-                  },
-                  {
-                    "name": "DATABASE",
-                    "value": "$(sqlDatabaseName)"
-                  },
-                  {
-                    "name": "USERNAME",
-                    "value": "$(sqlAdminUser)"
-                  },
-                  {
-                    "name": "PASSWORD",
-                    "value": "$(sqlAdminPassword)"
-                  }
-                ]
+  - stage:
+    jobs:
+    - job: 
+      steps:
+      - task: Docker@2
+        displayName: 'docker build and pushed the image'
+        inputs:
+          containerRegistry: 'webgoat-dcr'
+          repository: 'webgaotdotnet-IMAGE'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+          addPipelineData: false
+          addBaseImageData: false
+          tags: |
+           1.0.0
