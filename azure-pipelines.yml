@@ -14,7 +14,7 @@ stages:
         inputs:
           containerRegistry: 'webgoat-dcr'
           repository: 'webgaotdotnet-IMAGE'
-          command: 'buildAndPush'
+          command: 'build'
           Dockerfile: '**/dockerfile'
           addPipelineData: false
           addBaseImageData: false
