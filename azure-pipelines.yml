@@ -14,4 +14,4 @@ stages:
           containerRegistry: 'acr-svc'
           repository: 'payment-repository'
           command: 'buildAndPush'
-          Dockerfile: '**/Dockerfile'
+          Dockerfile: '**/dockerfile'
