@@ -2,7 +2,7 @@ trigger:
 - master
 
 pool:
- name: 'buildagent-payment'
+ name: 'payment-agent'
 
 stages:
   - stage:
