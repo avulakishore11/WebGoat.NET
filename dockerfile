@@ -19,7 +19,7 @@ RUN dotnet restore
 RUN dotnet test
 
 # Run build and publish
-RUN dotnet publish -c Dev -o /app/out
+RUN dotnet publish -c Release -o /app/out
 
 # Expose ports
 EXPOSE 8080
