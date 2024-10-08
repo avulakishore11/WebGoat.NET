@@ -2,7 +2,7 @@ trigger:
 - master
 
 pool:
- name: 'webgaot-pool'
+ name: 'buildagent-payment'
 
 stages:
   - stage:
@@ -10,12 +10,8 @@ stages:
     - job: 
       steps:
       - task: Docker@2
-        displayName: 'docker build and pushed the image'
         inputs:
-          containerRegistry: 'webgoat-dcr'
-          repository: 'webgaotdotnet-IMAGE'
-          command: 'build'
-          Dockerfile: '**/dockerfile'
-          addPipelineData: false
-          addBaseImageData: false
-          
+          containerRegistry: 'acr-svc'
+          repository: 'payment-repository'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
