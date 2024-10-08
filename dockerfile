@@ -9,11 +9,11 @@ WORKDIR /app
 
 
 # Copy the .csproj file and restore dependencies
-COPY *.csproj .
+COPY . .
 RUN dotnet restore
 
 # Copy the remaining source code and build the application
-COPY . .
+
 
 # Run test
 RUN dotnet test
