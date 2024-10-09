@@ -17,17 +17,7 @@ stages:
     steps:
     - task: Docker@2
       inputs:
-          containerRegistry: 'acr-svc'
-          repository: 'payment-repository'
-          command: 'buildAndPush'
-          Dockerfile: '**/dockerfile'
-      displayName: 'Build the Docker image'
-
-    - task: Docker@1      
-
-      inputs:
-        containerregistrytype: 'Container Registry'
-        dockerRegistryEndpoint: 'acr-svc'
-        command: 'Push an image'
-      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-      displayName: 'Push the Docker image to Dockerhub'
+        containerRegistry: 'Docker-hub'
+        repository: 'payment'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
