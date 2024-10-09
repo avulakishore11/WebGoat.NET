@@ -7,7 +7,7 @@ pool:
   name: 'payment-agent'
 
 variables:
-- group: 'docker' # Keep secrets secure in pipeline variables
+- group: 'docker' # Keep secrets secure in pipeline variables, 'docker' is the name of variable group in azure devops  
   
 
 stages:
@@ -17,7 +17,7 @@ stages:
   - job: Build
     displayName: Build and push Docker image
     steps:
-    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin
+    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin # this reference from VG of names.
       displayName: 'Docker Login'
     
     - task: Docker@2
