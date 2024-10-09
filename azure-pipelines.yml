@@ -28,3 +28,10 @@ stages:
         Dockerfile: '**/dockerfile'
         tags: |
           latest
+    - task: KubernetesManifest@1
+      inputs:
+        action: 'deploy'
+        connectionType: 'kubernetesServiceConnection'
+        kubernetesServiceConnection: 'k8s-svc connection'
+        manifests: 'deployment.yml'
+   
