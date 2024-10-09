@@ -7,8 +7,8 @@ pool:
   name: 'payment-agent'
 
 variables:
-  DOCKER_PASSWORD: 'docker-passwd'  # Keep secrets secure in pipeline variables
-  DOCKER_USER: 'docker-username'
+- group: 'docker' # Keep secrets secure in pipeline variables
+  
 
 stages:
 - stage: Build
