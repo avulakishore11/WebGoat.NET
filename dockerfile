@@ -9,7 +9,7 @@ WORKDIR /app
 
 
 # Copy the .csproj file and restore dependencies
-COPY *.sln .
+COPY WebGoat/WebGoat.NET.csproj .
 RUN dotnet restore
 
 # Copy the remaining source code and build the application
