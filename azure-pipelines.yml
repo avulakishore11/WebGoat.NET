@@ -1,17 +1,32 @@
+
 trigger:
-- master
+  branches:
+    include:
+      - master
 
 pool:
  name: 'payment-agent'
 
+
 stages:
-  - stage:
-    jobs:
-    - job: 
-      steps:
-      - task: Docker@2
-        inputs:
+- stage: Build
+  displayName: Build image
+  jobs:  
+  - job: Build
+    displayName: Build and push Docker image
+    steps:
+    - task: Docker@2
+      inputs:
           containerRegistry: 'acr-svc'
           repository: 'payment-repository'
           command: 'buildAndPush'
           Dockerfile: '**/dockerfile'
+      displayName: 'Build the Docker image'
+
+    - task: Docker@1      
+      inputs:
+        containerregistrytype: 'Container Registry'
+        dockerRegistryEndpoint: 'acr-svc'
+        command: 'Push an image'
+      condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+      displayName: 'Push the Docker image to Dockerhub'
