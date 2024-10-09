@@ -17,7 +17,7 @@ stages:
   - job: Build
     displayName: Build and push Docker image
     steps:
-    - script: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin
       displayName: 'Docker Login'
     
     - task: Docker@2
