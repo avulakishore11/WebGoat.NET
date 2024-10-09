@@ -35,5 +35,6 @@ spec:
             cpu: 100m
             memory: 100Mi
         ports:
-        - containerPort:  80
-          name:  payment
+        - name:  payment
+          containerPort:  80
+          
