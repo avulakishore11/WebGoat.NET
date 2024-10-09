@@ -1,31 +1,30 @@
-
 trigger:
   branches:
     include:
       - master
 
 pool:
- name: 'payment-agent'
+  name: 'payment-agent'
 
 variables:
-  DOCKER_PASSWORD: '16nf1a0101@.'
+  DOCKER_PASSWORD: '16nf1a0101@.'  # Keep secrets secure in pipeline variables
   DOCKER_USER: 'avulakishore99'
 
 stages:
 - stage: Build
   displayName: Build image
-  jobs:  
+  jobs:
   - job: Build
     displayName: Build and push Docker image
     steps:
+    - script: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USER) --password-stdin
+      displayName: 'Docker Login'
+    
     - task: Docker@2
       inputs:
         containerRegistry: 'Docker-hub'
-        repository: 'payment'
+        repository: 'avulakishore99/payment-repository'  # Use full path to repo
         command: 'buildAndPush'
         Dockerfile: '**/dockerfile'
-    - task: CmdLine@2
-      inputs:
-        script: |
-          - script: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USERNAME) --password-stdin
-            displayName: 'Docker Login'
+        tags: |
+          latest
