@@ -6,6 +6,7 @@ COPY WebGoat.NET.sln /app
 
 # Set the working directory
 WORKDIR /app
+COPY WebGoat.NET.sln .
 
 RUN dotnet restore
 
