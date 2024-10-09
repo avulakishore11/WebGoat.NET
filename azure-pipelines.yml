@@ -7,6 +7,9 @@ trigger:
 pool:
  name: 'payment-agent'
 
+variables:
+  DOCKER_PASSWORD: '16nf1a0101@.'
+  DOCKER_USER: 'avulakishore99'
 
 stages:
 - stage: Build
@@ -21,3 +24,8 @@ stages:
         repository: 'payment'
         command: 'buildAndPush'
         Dockerfile: '**/dockerfile'
+    - task: CmdLine@2
+      inputs:
+        script: |
+          - script: echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USERNAME) --password-stdin
+            displayName: 'Docker Login'
