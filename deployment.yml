@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  payment
-  namespace: default
+  namespace: paymentnamespace
   labels:
     app:  payment
 spec:
@@ -25,8 +25,9 @@ spec:
           # - Init containers always run to completion.
           # - Each init container must complete successfully before the next one starts.
       containers:
-      - name:  payment-container
-        image:  avulakishore99/payment-repository:latest
+        - name: payment-container
+          image: avulakishore99/payment-repository:$(Build.BuildId)  # Use BuildId with capital 'I'
+
         resources:
           requests:
             cpu: 100m
