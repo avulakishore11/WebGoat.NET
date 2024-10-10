@@ -7,8 +7,7 @@ pool:
   name: 'payment-agent'
 
 variables:
-- group: 'docker' # Keep secrets secure in pipeline variables, 'docker' is the name of variable group in azure devops  
-  
+- group: 'docker' # Keep secrets secure in pipeline variables, 'docker' is the name of the variable group in azure devops  
 
 stages:
 - stage: Build
@@ -17,7 +16,7 @@ stages:
   - job: Build
     displayName: Build and push Docker image
     steps:
-    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin # this reference from VG of names.
+    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin # Docker credentials from variable group
       displayName: 'Docker Login'
     
     - task: Docker@2
@@ -27,11 +26,26 @@ stages:
         command: 'buildAndPush'
         Dockerfile: '**/dockerfile'
         tags: |
-          latest
-    - task: KubernetesManifest@1
-      inputs:
-        action: 'deploy'
-        connectionType: 'kubernetesServiceConnection'
-        kubernetesServiceConnection: 'k8s-svc connection'
-        manifests: 'deployment.yml'
-   
+          $(Build.BuildNumber)
+
+- stage: Deploy
+  displayName: Deploy to AKS
+  jobs:
+  - deployment:
+    environment: 'dev'
+    displayName: Deploy to AKS
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - checkout: self
+          - task: KubernetesManifest@1
+            inputs:
+              action: 'deploy'
+              connectionType: 'kubernetesServiceConnection'
+              kubernetesServiceConnection: 'k8s-svc connection'
+              namespace: 'paymentnamespace'
+              manifests: 'deployment.yml'
+              containers: |
+                avulakishore99/payment-repository:$(Build.BuildNumber)
+              arguments: '--namespace=paymentnamespace'
