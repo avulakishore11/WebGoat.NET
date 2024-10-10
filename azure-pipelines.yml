@@ -43,7 +43,7 @@ stages:
             inputs:
               action: 'deploy'
               connectionType: 'kubernetesServiceConnection'
-              kubernetesServiceConnection: 'k8s-svc connection'
+              kubernetesServiceConnection: 'k8s-svc-connection'
               namespace: 'paymentnamespace'
               manifests: 'deployment.yml'
               containers: |
