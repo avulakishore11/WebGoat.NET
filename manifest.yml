@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: walmart-payment-deployment
+  namespace: payment
+  labels:
+    app: walmart-payment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: walmart-payment
+  template:
+    metadata:
+      labels:
+        app: walmart-payment
+    spec:
+      containers:
+      - name: payment-container
+        image: 'paymentACR1:$(Build.BuildNumber)'  # Corrected: Closing single quote
+        ports:
+        - name: walmart-payment
+          containerPort: 80  # Correct port definition
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: walmart-payment-service
+  namespace: payment
+spec:
+  selector:
+    app: walmart-payment  # Match the labels in the deployment
+  type: LoadBalancer
+  ports:
+  - name: walmart-payment
+    protocol: TCP
+    port: 80
+    targetPort: 8080
