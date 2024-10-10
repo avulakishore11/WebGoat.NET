@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name:  payment
-  namespace: default
+  namespace: default # make sure all are in within this ns
   labels:
     app:  payment
 spec:
