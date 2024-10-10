@@ -45,4 +45,4 @@ stages:
               manifests: 'manifest.yml'
               containers: |
                 paymentacr1.azurecr.io/paymentACR1:$(Build.BuildNumber)
-              
+              arguments: --namespace=payment
