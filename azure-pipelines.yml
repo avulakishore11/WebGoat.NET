@@ -5,7 +5,8 @@ trigger:
 
 pool:
   name: 'payment-agent-pool'
-  demands: '/var/lib/docker'
+  demands: 
+  - docker
 
 stages:
 - stage: Build
