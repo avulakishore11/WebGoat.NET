@@ -6,8 +6,6 @@ trigger:
 pool:
   name: 'payment-agent'
 
-variables:
-- group: 'docker' # Keep secrets secure in pipeline variables, 'docker' is the name of the variable group in azure devops  
 
 stages:
 - stage: Build
@@ -16,13 +14,11 @@ stages:
   - job: Build
     displayName: Build and push Docker image
     steps:
-    - script: echo $(docker-passwd) | docker login -u $(docker-username) --password-stdin # Docker credentials from variable group
-      displayName: 'Docker Login'
-    
+  
     - task: Docker@2
       inputs:
-        containerRegistry: 'Docker-hub'
-        repository: 'avulakishore99/payment-repository'  # Use full path to repo
+        containerRegistry: 'acr-svc-connection' # ACR service connection NAME.
+        repository: 'paymentACR1' # NAME OF ACR
         command: 'buildAndPush'
         Dockerfile: '**/dockerfile'
         tags: |
@@ -32,7 +28,7 @@ stages:
   displayName: Deploy to AKS
   jobs:
   - deployment:
-    environment: 'dev'
+    environment: 'Dev'
     displayName: Deploy to AKS
     strategy:
       runOnce:
@@ -44,8 +40,8 @@ stages:
               action: 'deploy'
               connectionType: 'kubernetesServiceConnection'
               kubernetesServiceConnection: 'k8s-svc-connection'
-              namespace: 'default'
+              namespace: 'payment'
               manifests: 'deployment.yml'
               containers: |
-                avulakishore99/payment-repository:$(Build.BuildNumber)
+                paymentacr1.azurecr.io/paymentACR1:$(Build.BuildNumber)
               
