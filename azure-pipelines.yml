@@ -4,7 +4,7 @@ trigger:
       - master
 
 pool:
-  name: 'payment-agent'
+  name: 'payment-agent-pool'
 
 
 stages:
@@ -27,8 +27,9 @@ stages:
 - stage: Deploy
   displayName: Deploy to AKS
   jobs:
-  - deployment:
+  - deployment: 'deploy'
     environment: 'Dev'
+    dependsOn: Build
     displayName: Deploy to AKS
     strategy:
       runOnce:
@@ -41,7 +42,7 @@ stages:
               connectionType: 'kubernetesServiceConnection'
               kubernetesServiceConnection: 'k8s-svc-connection'
               namespace: 'payment'
-              manifests: 'deployment.yml'
+              manifests: 'manifest.yml'
               containers: |
                 paymentacr1.azurecr.io/paymentACR1:$(Build.BuildNumber)
               
