@@ -27,7 +27,8 @@ stages:
 - stage: Deploy
   displayName: Deploy to AKS
   jobs:
-  - deployment: 'deploy'
+  - job: Build
+  - deployment: 
     environment: 'Dev'
     dependsOn: Build
     displayName: Deploy to AKS
