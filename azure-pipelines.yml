@@ -44,8 +44,8 @@ stages:
               action: 'deploy'
               connectionType: 'kubernetesServiceConnection'
               kubernetesServiceConnection: 'k8s-svc-connection'
-              namespace: 'paymentnamespace'
+              namespace: 'default'
               manifests: 'deployment.yml'
               containers: |
                 avulakishore99/payment-repository:$(Build.BuildNumber)
-              arguments: '--namespace=paymentnamespace'
+              
