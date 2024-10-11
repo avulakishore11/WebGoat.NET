@@ -23,4 +23,6 @@ EXPOSE 8080
 
 
 # Set the entry point for running the app
-ENTRYPOINT ["dotnet", "/app/out/*.dll"]  #** Here we referenced that directory that stores the build artifact.
+# ENTRYPOINT ["dotnet", "/app/out/*.dll"]  #** Here we referenced that directory that stores the build artifact. ( my mistake: Your Dockerfile has a minor issue in the ENTRYPOINT line. The use of *.dll won't work because it doesn't resolve to a specific file. Instead, you need to specify the actual name of the DLL that was generated during the publish step.
+
+ENTRYPOINT ["dotnet", "/app/out/WebGoat.NET.dll"]
