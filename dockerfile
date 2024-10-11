@@ -19,7 +19,7 @@ RUN dotnet test
 RUN dotnet publish -c Release -o /app   # **This command builds and pushes the image to /app/out directory**.
 
 # Debugging: Check the contents of /app
-# RUN ls /app  # Add this line to verify the contents
+ RUN ls /app  # Add this line to verify the contents
  
 # Use the .NET official runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
