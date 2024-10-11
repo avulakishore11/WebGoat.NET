@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: payment-container
-        image: 'paymentACR1:$(Build.BuildNumber)'  # Corrected: Closing single quote
+        image: 'paymentACR1.azurecr.io/paymentacr1:$(Build.BuildNumber)'  # Corrected: Closing single quote
         ports:
         - name: walmart-payment
           containerPort: 80  # Correct port definition
