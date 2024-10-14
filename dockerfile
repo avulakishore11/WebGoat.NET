@@ -5,8 +5,8 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
 WORKDIR /app
 
 # Copy the solution and restore dependencies
-COPY WebGoat.NET.sln . 
-COPY WebGoat.NET/WebGoat.NET.csproj WebGoat.NET/
+COPY *.sln ./
+COPY WebGoat.NET/WebGoat.NET.csproj ./
 RUN dotnet restore
 
 # Copy the entire project and build it
