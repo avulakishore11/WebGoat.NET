@@ -6,12 +6,12 @@ FROM mcr.microsoft.com/dotnet/sdk:6.0 AS builder
 # Set the working directory
 
 WORKDIR /app
-COPY ["WebGoat/WebGoat.NET.csproj" "WebGoat/"]
+COPY ["WebGoat.NET.csproj" "WebGoat.NET/"]
 
-RUN dotnet restore "WebGoat/WebGoat.NET.csporj"
+RUN dotnet restore "WebGoat.NET.csporj"
 
 COPY . .
-WORKDIR "/app/WebGoat"
+WORKDIR "/app/WebGoat.NET"
 RUN dotnet build "WebGoat.NET.csproj" -c Release -o /src/build
 
 # Check Build Output: Ensure that the dotnet publish command generates the output in the /app/out directory.
