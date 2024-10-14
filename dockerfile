@@ -6,12 +6,13 @@ WORKDIR /app
 
 # Copy the solution and restore dependencies
 COPY *.sln ./
-COPY WebGoat.NET/WebGoat.NET.csproj ./
+COPY WebGoat.NET/WebGoat.NET.csproj WebGoat.NET/
 RUN dotnet restore
 
 # Copy the entire project and build it
 COPY . .
-RUN dotnet publish -c Release -o /app/out
+WORKDIR /app/WebGoat.NET
+RUN dotnet publish -c Release -o /out
 
 # Stage 2: Create the runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:6.0
@@ -19,7 +20,7 @@ FROM mcr.microsoft.com/dotnet/aspnet:6.0
 WORKDIR /app
 
 # Copy the published files from the builder stage
-COPY --from=builder /app/out .
+COPY --from=builder /out ./
 
 # Expose port 8080
 EXPOSE 8080
